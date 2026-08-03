@@ -1,3 +1,25 @@
+const editProfileButton = document.querySelector(".profile__edit-button");
+
+const editProfileModal = document.querySelector("#edit-popup");
+
+const closeButton = editProfileModal.querySelector(".popup__close");
+
+function openModal(modal) {
+  modal.classList.add("popup_is-opened");
+}
+
+function closeModal(modal) {
+  modal.classList.remove("popup_is-opened");
+}
+
+editProfileButton.addEventListener("click", function () {
+  openModal(editProfileModal);
+});
+
+closeButton.addEventListener("click", function () {
+  closeModal(editProfileModal);
+});
+
 const initialCards = [
   {
     name: "Valle de Yosemite",
