@@ -28,6 +28,18 @@ const imageModalImage = imageModal.querySelector(".popup__image");
 
 const imageModalCaption = imageModal.querySelector(".popup__caption");
 
+const editProfileForm = document.querySelector("#edit-profile-form");
+
+const profileTitle = document.querySelector(".profile__title");
+
+const profileDescription = document.querySelector(".profile__description");
+
+const nameInput = document.querySelector(".popup__input_type_name");
+
+const descriptionInput = document.querySelector(
+  ".popup__input_type_description",
+);
+
 function openModal(modal) {
   modal.classList.add("popup_is-opened");
 }
@@ -35,10 +47,17 @@ function openModal(modal) {
 function closeModal(modal) {
   modal.classList.remove("popup_is-opened");
 }
+function fillProfileForm() {
+  nameInput.value = profileTitle.textContent;
+  descriptionInput.value = profileDescription.textContent;
+}
 
-editProfileButton.addEventListener("click", function () {
+function handleOpenEditModal() {
+  fillProfileForm();
   openModal(editProfileModal);
-});
+}
+
+editProfileButton.addEventListener("click", handleOpenEditModal);
 
 closeButton.addEventListener("click", function () {
   closeModal(editProfileModal);
@@ -118,6 +137,15 @@ function handleCardFormSubmit(evt) {
   newCardForm.reset();
 }
 
+function handleProfileFormSubmit(evt) {
+  evt.preventDefault();
+
+  profileTitle.textContent = nameInput.value;
+  profileDescription.textContent = descriptionInput.value;
+
+  closeModal(editProfileModal);
+}
+
 function handleImageClick(name, link) {
   imageModalImage.src = link;
   imageModalImage.alt = name;
@@ -135,10 +163,12 @@ newCardCloseButton.addEventListener("click", function () {
 });
 newCardForm.addEventListener("submit", handleCardFormSubmit);
 
-initialCards.forEach(function (card) {
-  renderCard(card.name, card.link, cardsList);
-});
-
 imageModalCloseButton.addEventListener("click", function () {
   closeModal(imageModal);
+});
+
+editProfileForm.addEventListener("submit", handleProfileFormSubmit);
+
+initialCards.forEach(function (card) {
+  renderCard(card.name, card.link, cardsList);
 });
