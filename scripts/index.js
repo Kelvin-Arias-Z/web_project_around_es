@@ -4,6 +4,30 @@ const editProfileModal = document.querySelector("#edit-popup");
 
 const closeButton = editProfileModal.querySelector(".popup__close");
 
+const cardTemplate = document.querySelector("#card-template");
+
+const cardsList = document.querySelector(".cards__list");
+
+const addCardButton = document.querySelector(".profile__add-button");
+
+const newCardModal = document.querySelector("#new-card-popup");
+
+const newCardCloseButton = newCardModal.querySelector(".popup__close");
+
+const newCardForm = document.querySelector("#new-card-form");
+
+const cardNameInput = document.querySelector(".popup__input_type_card-name");
+
+const cardLinkInput = document.querySelector(".popup__input_type_url");
+
+const imageModal = document.querySelector("#image-popup");
+
+const imageModalCloseButton = imageModal.querySelector(".popup__close");
+
+const imageModalImage = imageModal.querySelector(".popup__image");
+
+const imageModalCaption = imageModal.querySelector(".popup__caption");
+
 function openModal(modal) {
   modal.classList.add("popup_is-opened");
 }
@@ -46,6 +70,75 @@ const initialCards = [
     link: "https://practicum-content.s3.us-west-1.amazonaws.com/web-code/moved_lago.jpg",
   },
 ];
+
+function getCardElement(
+  name = "Sin título",
+  link = "./images/placeholder.jpg",
+) {
+  const cardElement = cardTemplate.content
+    .querySelector(".card")
+    .cloneNode(true);
+
+  const cardTitle = cardElement.querySelector(".card__title");
+  const cardImage = cardElement.querySelector(".card__image");
+
+  cardImage.addEventListener("click", function () {
+    handleImageClick(name, link);
+  });
+
+  const likeButton = cardElement.querySelector(".card__like-button");
+  const deleteButton = cardElement.querySelector(".card__delete-button");
+
+  cardTitle.textContent = name;
+  cardImage.src = link;
+  cardImage.alt = name;
+
+  likeButton.addEventListener("click", function () {
+    likeButton.classList.toggle("card__like-button_is-active");
+  });
+
+  deleteButton.addEventListener("click", function () {
+    cardElement.remove();
+  });
+
+  return cardElement;
+}
+
+function renderCard(name, link, container) {
+  const cardElement = getCardElement(name, link);
+  container.prepend(cardElement);
+}
+function handleCardFormSubmit(evt) {
+  evt.preventDefault();
+
+  renderCard(cardNameInput.value, cardLinkInput.value, cardsList);
+
+  closeModal(newCardModal);
+
+  newCardForm.reset();
+}
+
+function handleImageClick(name, link) {
+  imageModalImage.src = link;
+  imageModalImage.alt = name;
+  imageModalCaption.textContent = name;
+
+  openModal(imageModal);
+}
+
+addCardButton.addEventListener("click", function () {
+  openModal(newCardModal);
+});
+
+newCardCloseButton.addEventListener("click", function () {
+  closeModal(newCardModal);
+});
+newCardForm.addEventListener("submit", handleCardFormSubmit);
+
 initialCards.forEach(function (card) {
-  console.log(card.name);
+  renderCard(card.name, card.link, cardsList);
+});
+
+imageModalCloseButton.addEventListener("click", function () {
+  closeModal(imageModal);
 });
