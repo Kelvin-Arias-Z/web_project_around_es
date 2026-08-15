@@ -81,7 +81,7 @@ function fillProfileForm() {
 
 function handleOpenEditModal() {
   fillProfileForm();
-  resetValidation(editProfileForm);
+  resetValidation(editProfileForm, validationConfig);
   openModal(editProfileModal);
 }
 
@@ -130,7 +130,7 @@ function handleCardFormSubmit(evt) {
   renderCard(cardNameInput.value, cardLinkInput.value, cardsList);
   closeModal(newCardModal);
   newCardForm.reset();
-  resetValidation(newCardForm);
+  resetValidation(newCardForm, validationConfig);
 }
 
 function handleImageClick(name, link) {
@@ -140,68 +140,13 @@ function handleImageClick(name, link) {
   openModal(imageModal);
 }
 
-// ----- Validación -----
-
-function showInputError(form, input) {
-  const errorElement = form.querySelector(`#${input.name}-error`);
-  input.classList.add("popup__input_type_error");
-  errorElement.textContent = input.validationMessage;
-}
-
-function hideInputError(form, input) {
-  const errorElement = form.querySelector(`#${input.name}-error`);
-  input.classList.remove("popup__input_type_error");
-  errorElement.textContent = "";
-}
-
-function checkInputValidity(form, input) {
-  if (!input.validity.valid) {
-    showInputError(form, input);
-  } else {
-    hideInputError(form, input);
-  }
-}
-
-function toggleButtonState(inputs, button) {
-  const isFormValid = inputs.every((input) => input.validity.valid);
-  if (isFormValid) {
-    button.removeAttribute("disabled");
-    button.classList.remove("popup__button_disabled");
-  } else {
-    button.setAttribute("disabled", true);
-    button.classList.add("popup__button_disabled");
-  }
-}
-
-function setEventListeners(form) {
-  const inputs = Array.from(form.querySelectorAll(".popup__input"));
-  const button = form.querySelector(".popup__button");
-  toggleButtonState(inputs, button);
-  inputs.forEach((input) => {
-    input.addEventListener("input", () => {
-      checkInputValidity(form, input);
-      toggleButtonState(inputs, button);
-    });
-  });
-}
-
-function resetValidation(form) {
-  const inputs = Array.from(form.querySelectorAll(".popup__input"));
-  const button = form.querySelector(".popup__button");
-  inputs.forEach((input) => hideInputError(form, input));
-  toggleButtonState(inputs, button);
-}
-
-function enableValidation() {
-  const forms = Array.from(document.querySelectorAll(".popup__form"));
-  forms.forEach((form) => setEventListeners(form));
-}
+// ----- Listeners generales -----
 
 editProfileButton.addEventListener("click", handleOpenEditModal);
 editProfileForm.addEventListener("submit", handleProfileFormSubmit);
 
 addCardButton.addEventListener("click", function () {
-  resetValidation(newCardForm);
+  resetValidation(newCardForm, validationConfig);
   openModal(newCardModal);
 });
 newCardForm.addEventListener("submit", handleCardFormSubmit);
@@ -214,8 +159,10 @@ document.querySelectorAll(".popup").forEach((modal) => {
   modal.addEventListener("mousedown", handleOverlayClick);
 });
 
+// ----- Inicialización -----
+
 initialCards.forEach(function (card) {
   renderCard(card.name, card.link, cardsList);
 });
 
-enableValidation();
+enableValidation(validationConfig);
