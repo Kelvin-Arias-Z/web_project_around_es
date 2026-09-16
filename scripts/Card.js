@@ -5,14 +5,16 @@ export default class Card {
     this._templateSelector = templateSelector;
     this._handleCardClick = handleCardClick;
   }
-  _getTemplate() {
-  const cardElement = document
-    .querySelector(this._templateSelector)
-    .content.querySelector(".card")
-    .cloneNode(true);
 
-  return cardElement;
-}
+  _getTemplate() {
+    const cardElement = document
+      .querySelector(this._templateSelector)
+      .content.querySelector(".card")
+      .cloneNode(true);
+
+    return cardElement;
+  }
+
   _setEventListeners() {
     this._likeButton.addEventListener("click", () => {
       this._likeButton.classList.toggle("card__like-button_is-active");
@@ -27,7 +29,7 @@ export default class Card {
     });
   }
 
- generateCard() {
+  generateCard() {
     this._element = this._getTemplate();
 
     this._cardImage = this._element.querySelector(".card__image");

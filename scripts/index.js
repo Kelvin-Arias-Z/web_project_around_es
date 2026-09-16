@@ -1,5 +1,10 @@
 import FormValidator from "./FormValidator.js";
 import Card from "./Card.js";
+import {
+  openModal,
+  closeModal,
+  handleOverlayClick,
+} from "./utils.js";
 
 const editProfileButton = document.querySelector(".profile__edit-button");
 const editProfileModal = document.querySelector("#edit-popup");
@@ -64,33 +69,6 @@ const initialCards = [
     link: "https://practicum-content.s3.us-west-1.amazonaws.com/web-code/moved_lago.jpg",
   },
 ];
-
-// ----- Popups -----
-
-function handleEscClose(evt) {
-  if (evt.key === "Escape") {
-    const openedModal = document.querySelector(".popup_is-opened");
-    if (openedModal) {
-      closeModal(openedModal);
-    }
-  }
-}
-
-function openModal(modal) {
-  modal.classList.add("popup_is-opened");
-  document.addEventListener("keydown", handleEscClose);
-}
-
-function closeModal(modal) {
-  modal.classList.remove("popup_is-opened");
-  document.removeEventListener("keydown", handleEscClose);
-}
-
-function handleOverlayClick(evt) {
-  if (evt.target === evt.currentTarget) {
-    closeModal(evt.currentTarget);
-  }
-}
 
 // ----- Perfil -----
 
