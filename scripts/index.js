@@ -1,3 +1,5 @@
+import FormValidator from "./FormValidator.js";
+
 const editProfileButton = document.querySelector(".profile__edit-button");
 const editProfileModal = document.querySelector("#edit-popup");
 const cardTemplate = document.querySelector("#card-template");
@@ -16,6 +18,24 @@ const profileDescription = document.querySelector(".profile__description");
 const nameInput = document.querySelector(".popup__input_type_name");
 const descriptionInput = document.querySelector(
   ".popup__input_type_description",
+);
+
+const validationConfig = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+};
+
+const editProfileValidator = new FormValidator(
+  validationConfig,
+  editProfileForm
+);
+
+const newCardValidator = new FormValidator(
+  validationConfig,
+  newCardForm
 );
 
 const initialCards = [
@@ -81,7 +101,7 @@ function fillProfileForm() {
 
 function handleOpenEditModal() {
   fillProfileForm();
-  resetValidation(editProfileForm, validationConfig);
+  editProfileValidator.resetValidation();
   openModal(editProfileModal);
 }
 
@@ -130,7 +150,7 @@ function handleCardFormSubmit(evt) {
   renderCard(cardNameInput.value, cardLinkInput.value, cardsList);
   closeModal(newCardModal);
   newCardForm.reset();
-  resetValidation(newCardForm, validationConfig);
+  newCardValidator.resetValidation();
 }
 
 function handleImageClick(name, link) {
@@ -146,7 +166,7 @@ editProfileButton.addEventListener("click", handleOpenEditModal);
 editProfileForm.addEventListener("submit", handleProfileFormSubmit);
 
 addCardButton.addEventListener("click", function () {
-  resetValidation(newCardForm, validationConfig);
+  newCardValidator.resetValidation();
   openModal(newCardModal);
 });
 newCardForm.addEventListener("submit", handleCardFormSubmit);
@@ -165,4 +185,5 @@ initialCards.forEach(function (card) {
   renderCard(card.name, card.link, cardsList);
 });
 
-enableValidation(validationConfig);
+editProfileValidator.setEventListeners();
+newCardValidator.setEventListeners();
