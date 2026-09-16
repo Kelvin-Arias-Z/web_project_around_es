@@ -1,8 +1,8 @@
 import FormValidator from "./FormValidator.js";
+import Card from "./Card.js";
 
 const editProfileButton = document.querySelector(".profile__edit-button");
 const editProfileModal = document.querySelector("#edit-popup");
-const cardTemplate = document.querySelector("#card-template");
 const cardsList = document.querySelector(".cards__list");
 const addCardButton = document.querySelector(".profile__add-button");
 const newCardModal = document.querySelector("#new-card-popup");
@@ -114,34 +114,17 @@ function handleProfileFormSubmit(evt) {
 
 // ----- Tarjetas -----
 
-function getCardElement(name, link) {
-  const cardElement = cardTemplate.content
-    .querySelector(".card")
-    .cloneNode(true);
-  const cardTitle = cardElement.querySelector(".card__title");
-  const cardImage = cardElement.querySelector(".card__image");
-  const likeButton = cardElement.querySelector(".card__like-button");
-  const deleteButton = cardElement.querySelector(".card__delete-button");
-
-  cardTitle.textContent = name;
-  cardImage.src = link;
-  cardImage.alt = name;
-
-  cardImage.addEventListener("click", function () {
-    handleImageClick(name, link);
-  });
-  likeButton.addEventListener("click", function () {
-    likeButton.classList.toggle("card__like-button_is-active");
-  });
-  deleteButton.addEventListener("click", function () {
-    cardElement.remove();
-  });
-
-  return cardElement;
-}
-
 function renderCard(name, link, container) {
-  const cardElement = getCardElement(name, link);
+  const card = new Card(
+    {
+      name: name,
+      link: link,
+    },
+    "#card-template",
+    handleImageClick
+  );
+
+  const cardElement = card.generateCard();
   container.prepend(cardElement);
 }
 
