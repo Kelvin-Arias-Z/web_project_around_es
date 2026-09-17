@@ -30,4 +30,4 @@ En esta etapa del proyecto, el código JavaScript fue refactorizado utilizando p
 
 ## GitHub Pages
 
-Pendiente de publicación.
+https://kelvin-arias-z.github.io/web_project_around_es/

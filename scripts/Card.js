@@ -15,17 +15,29 @@ export default class Card {
     return cardElement;
   }
 
+  _handleLikeClick() {
+    this._likeButton.classList.toggle("card__like-button_is-active");
+  }
+
+  _handleDeleteClick() {
+    this._element.remove();
+  }
+
+  _handleImageClick() {
+    this._handleCardClick(this._name, this._link);
+  }
+
   _setEventListeners() {
     this._likeButton.addEventListener("click", () => {
-      this._likeButton.classList.toggle("card__like-button_is-active");
+      this._handleLikeClick();
     });
 
     this._deleteButton.addEventListener("click", () => {
-      this._element.remove();
+      this._handleDeleteClick();
     });
 
     this._cardImage.addEventListener("click", () => {
-      this._handleCardClick(this._name, this._link);
+      this._handleImageClick();
     });
   }
 
