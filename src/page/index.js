@@ -11,11 +11,9 @@ const api = new Api({
   baseUrl: "https://around-api.es.tripleten-services.com/v1",
   headers: {
     authorization: "411ad360-7219-45d7-9a69-9cd1f2c1a9a5",
-    "Content-Type": "application/json"
-  }
+    "Content-Type": "application/json",
+  },
 });
-
-
 
 const editProfileButton = document.querySelector(".profile__edit-button");
 const addCardButton = document.querySelector(".profile__add-button");
@@ -25,7 +23,7 @@ const editProfileForm = document.querySelector("#edit-profile-form");
 const newCardForm = document.querySelector("#new-card-form");
 const nameInput = document.querySelector(".popup__input_type_name");
 const descriptionInput = document.querySelector(
-  ".popup__input_type_description"
+  ".popup__input_type_description",
 );
 
 const validationConfig = {
@@ -35,7 +33,6 @@ const validationConfig = {
   inactiveButtonClass: "popup__button_disabled",
   inputErrorClass: "popup__input_type_error",
 };
-
 
 let currentUserId;
 const userInfo = new UserInfo({
@@ -52,7 +49,7 @@ Promise.all([api.getUserInfo(), api.getInitialCards()])
     userInfo.setUserInfo({
       name: userData.name,
       job: userData.about,
-      avatar: userData.avatar
+      avatar: userData.avatar,
     });
 
     cardSection.setItems(cards);
@@ -61,52 +58,49 @@ Promise.all([api.getUserInfo(), api.getInitialCards()])
   .catch((error) => {
     console.error(error);
   });
+
 const imagePopup = new PopupWithImage("#image-popup");
 const deletePopup = new PopupWithConfirmation("#delete-popup");
-
 function createCard(data) {
   const card = new Card(
     data,
     "#card-template",
-    (name, link) => {
-      imagePopup.open(name, link);
-    },
-(cardInstance) => {
-  const isLiked = cardInstance._isLiked;
-
-      const request = isLiked
-        ? api.unlikeCard(cardInstance._id)
-        : api.likeCard(cardInstance._id);
-
-      request
-        .then((updatedCard) => {
-          console.log("Respuesta del servidor:", updatedCard);
-          cardInstance._isLiked = updatedCard.isLiked;
-
-          cardInstance._likeButton.classList.toggle(
-            "card__like-button_is-active",
-            !isLiked
-          );
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+    {
+      handleCardClick: (name, link) => {
+        imagePopup.open(name, link);
       },
-    currentUserId,
-(cardInstance) => {
-  deletePopup.setSubmitAction(() => {
-    api.deleteCard(cardInstance._id)
-      .then(() => {
-        cardInstance._element.remove();
-        deletePopup.close();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  });
 
-  deletePopup.open();
-}
+      handleLikeClick: (cardInstance) => {
+        const request = cardInstance.isLiked()
+          ? api.unlikeCard(cardInstance.getId())
+          : api.likeCard(cardInstance.getId());
+
+        request
+          .then((updatedCard) => {
+            cardInstance.setLikes(updatedCard.isLiked);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      },
+
+      handleDeleteClick: (cardInstance) => {
+        deletePopup.setSubmitAction(() => {
+          api
+            .deleteCard(cardInstance.getId())
+            .then(() => {
+              cardInstance.removeCard();
+              deletePopup.close();
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        });
+
+        deletePopup.open();
+      },
+    },
+    currentUserId,
   );
 
   return card.generateCard();
@@ -120,74 +114,62 @@ const cardSection = new Section(
       cardSection.addItem(cardElement);
     },
   },
-  ".cards__list"
+  ".cards__list",
 );
 
-const editProfilePopup = new PopupWithForm(
-  "#edit-popup",
-  (formData) => {
-    const submitButton = editProfileForm.querySelector(".popup__button");
+const editProfilePopup = new PopupWithForm("#edit-popup", (formData) => {
+  editProfilePopup.renderLoading(true);
 
-    submitButton.textContent = "Guardando...";
-    submitButton.disabled = true;
-
-    api.updateUserInfo(formData.name, formData.description)
-      .then((userData) => {
-        userInfo.setUserInfo({
-          name: userData.name,
-          job: userData.about,
-        });
-
-        editProfilePopup.close();
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        submitButton.textContent = "Guardar";
-        submitButton.disabled = false;
+  api
+    .updateUserInfo(formData.name, formData.description)
+    .then((userData) => {
+      userInfo.setUserInfo({
+        name: userData.name,
+        job: userData.about,
       });
-  }
-);
 
-const newCardPopup = new PopupWithForm(
-  "#new-card-popup",
-  (formData) => {
-    const submitButton = newCardForm.querySelector(".popup__button");
+      editProfilePopup.close();
+    })
+    .catch((error) => {
+      console.error(error);
+    })
+    .finally(() => {
+      editProfilePopup.renderLoading(false);
+    });
+});
 
-    submitButton.textContent = "Creando...";
+const newCardPopup = new PopupWithForm("#new-card-popup", (formData) => {
+  newCardPopup.renderLoading(true, "Creando...");
 
-    api.addCard(formData["place-name"], formData.link)
-      .then((cardData) => {
-        const cardElement = createCard(cardData);
+  api
+    .addCard(formData["place-name"], formData.link)
+    .then((cardData) => {
+      const cardElement = createCard(cardData);
 
-        cardSection.addItem(cardElement);
-        newCardPopup.close();
-        newCardValidator.resetValidation();
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        submitButton.textContent = "Crear";
-      });
-  }
-);
+      cardSection.addItem(cardElement);
+      newCardPopup.close();
+      newCardValidator.resetValidation();
+    })
+    .catch((error) => {
+      console.error(error);
+    })
+    .finally(() => {
+      newCardPopup.renderLoading(false);
+    });
+});
 
 const avatarPopup = new PopupWithForm("#avatar-popup", (formData) => {
-  const submitButton = avatarForm.querySelector(".popup__button");
+  avatarPopup.renderLoading(true);
 
-  submitButton.textContent = "Guardando...";
-  submitButton.disabled = true;
-
-  api.updateAvatar(formData.avatar)
+  api
+    .updateAvatar(formData.avatar)
     .then((userData) => {
       const currentUserInfo = userInfo.getUserInfo();
 
       userInfo.setUserInfo({
         name: currentUserInfo.name,
         job: currentUserInfo.job,
-        avatar: userData.avatar
+        avatar: userData.avatar,
       });
 
       avatarPopup.close();
@@ -195,26 +177,19 @@ const avatarPopup = new PopupWithForm("#avatar-popup", (formData) => {
     .catch((error) => {
       console.error(error);
     })
-.finally(() => {
-  submitButton.textContent = "Guardar";
-  submitButton.disabled = false;
-});
+    .finally(() => {
+      avatarPopup.renderLoading(false);
+    });
 });
 
 const editProfileValidator = new FormValidator(
   validationConfig,
-  editProfileForm
+  editProfileForm,
 );
 
-const newCardValidator = new FormValidator(
-  validationConfig,
-  newCardForm
-);
+const newCardValidator = new FormValidator(validationConfig, newCardForm);
 
-const avatarValidator = new FormValidator(
-  validationConfig,
-  avatarForm
-);
+const avatarValidator = new FormValidator(validationConfig, avatarForm);
 
 editProfileButton.addEventListener("click", () => {
   const currentUserInfo = userInfo.getUserInfo();

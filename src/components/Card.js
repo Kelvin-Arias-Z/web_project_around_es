@@ -1,5 +1,10 @@
 export default class Card {
-  constructor(data, templateSelector, handleCardClick, handleLikeClick, currentUserId, handleDeleteClick) {
+  constructor(
+    data,
+    templateSelector,
+    { handleCardClick, handleLikeClick, handleDeleteClick },
+    currentUserId
+  ) {
     this._name = data.name;
     this._link = data.link;
     this._templateSelector = templateSelector;
@@ -11,6 +16,24 @@ export default class Card {
     this._currentUserId = currentUserId;
     this._handleDeleteClickCallback = handleDeleteClick;
   }
+
+getId() {
+  return this._id;
+}
+
+isLiked() {
+  return this._isLiked;
+}
+
+setLikes(isLiked) {
+  this._isLiked = isLiked;
+  this._likeButton.classList.toggle("card__like-button_is-active", isLiked);
+}
+
+removeCard() {
+  this._element.remove();
+  this._element = null;
+}
 
   _getTemplate() {
     const cardElement = document
@@ -38,11 +61,9 @@ _handleLikeClick() {
       this._handleLikeClick();
     });
 
-if (this._ownerId === this._currentUserId) {
-  this._deleteButton.addEventListener("click", () => {
-    this._handleDeleteClick();
-  });
-}
+this._deleteButton?.addEventListener("click", () => {
+  this._handleDeleteClick();
+});
 
     this._cardImage.addEventListener("click", () => {
       this._handleImageClick();
@@ -55,8 +76,9 @@ if (this._ownerId === this._currentUserId) {
     this._cardImage = this._element.querySelector(".card__image");
     this._likeButton = this._element.querySelector(".card__like-button");
     this._deleteButton = this._element.querySelector(".card__delete-button");
-    if (this._ownerId !== this._currentUserId) {
+if (this._ownerId !== this._currentUserId) {
   this._deleteButton.remove();
+  this._deleteButton = null;
 }
     this._cardTitle = this._element.querySelector(".card__title");
 
